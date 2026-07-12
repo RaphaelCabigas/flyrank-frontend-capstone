@@ -2,6 +2,43 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
+## Tech Stack
+
+- React
+- Vite
+- JavaScript (ES6+)
+- SCSS (Sass)
+- Git
+- GitHub
+
+## Coding Conventions
+
+- Write clean, readable, and maintainable code.
+- Use meaningful names for variables, functions, and components.
+- Keep components and functions small and focused.
+- Follow consistent formatting and file organization.
+- Use modern JavaScript (ES6+) practices.
+- Avoid unnecessary code duplication.
+- Write comments only when the logic is not obvious.
+- Test changes before committing.
+- Use clear and descriptive Git commit messages.
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Start the dev server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview the production build
+npm run preview
+```
+
 Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
