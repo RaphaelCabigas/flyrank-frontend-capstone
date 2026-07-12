@@ -1,6 +1,6 @@
-# React + Vite
+# Flyrank Frontend Capstone By Raphael Cabigas
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This repository contains files for the Flyrank Frontend AI Engineering Internship from July 2026.
 
 ## Tech Stack
 
@@ -8,24 +8,20 @@ This template provides a minimal setup to get React working in Vite with HMR and
 - Vite
 - JavaScript (ES6+)
 - SCSS (Sass)
-- Git
-- GitHub
+- Git / GitHub
 
-## Coding Conventions
+## Prerequisites
 
-- Write clean, readable, and maintainable code.
-- Use meaningful names for variables, functions, and components.
-- Keep components and functions small and focused.
-- Follow consistent formatting and file organization.
-- Use modern JavaScript (ES6+) practices.
-- Avoid unnecessary code duplication.
-- Write comments only when the logic is not obvious.
-- Test changes before committing.
-- Use clear and descriptive Git commit messages.
+- Node.js `>=18.x`
+- npm `>=9.x`
 
 ## Getting Started
 
 ```bash
+# Clone the repo
+git clone [https://github.com/RaphaelCabigas/flyrank-frontend-capstone]
+cd [flyrank-frontend-capstone]
+
 # Install dependencies
 npm install
 
@@ -39,15 +35,24 @@ npm run build
 npm run preview
 ```
 
-Currently, two official plugins are available:
+## Project Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```
+src/
+├── assets/         # Static assets (images, fonts)
+├── components/     # Reusable UI components
+├── pages/          # Route-level views
+├── styles/         # Global and shared SCSS
+├── hooks/          # Custom React hooks
+├── utils/          # Helper functions
+└── main.jsx        # App entry point
+```
 
-## React Compiler
+## Coding Conventions
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Components use `PascalCase`; functions and variables use `camelCase`.
+- One component per file, matching the filename to the component name.
+- Keep components small and focused on a single responsibility.
+- SCSS follows a `_variables.scss` / `_mixins.scss` partial pattern imported via a single entry stylesheet.
+- Linting is enforced via ESLint (see `.eslintrc` / `eslint.config.js`) — run `npm run lint` before committing.
+- Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/) (e.g. `feat: add login form`, `fix: correct button alignment`).
