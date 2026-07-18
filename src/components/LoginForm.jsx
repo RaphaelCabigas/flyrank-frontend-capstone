@@ -1,154 +1,127 @@
 import { useState } from "react";
-import "./LoginForm.css";
+import "./LoginForm.scss";
 
-/**
- * LoginForm
- *
- * Usage:
- *   <LoginForm onSubmit={async ({ email, password }) => {
- *     const res = await fetch("/api/login", {
- *       method: "POST",
- *       headers: { "Content-Type": "application/json" },
- *       body: JSON.stringify({ email, password }),
- *     });
- *     if (!res.ok) throw new Error("Invalid email or password");
- *   }} />
- *
- * Props:
- *   onSubmit(values) -> Promise    Called with { email, password }.
- *                                  Throw an Error to show its message as a form-level error.
- *   onSuccess()                   Optional. Called after onSubmit resolves without error.
- */
-export default function LoginForm({ onSubmit, onSuccess }) {
-  const [values, setValues] = useState({ email: "", password: "" });
-  const [touched, setTouched] = useState({});
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_PASSWORD_LENGTH = 8;
+
+function validateFields(email, password) {
+  const nextErrors = {};
+
+  const trimmedEmail = email.trim();
+  if (!trimmedEmail) {
+    nextErrors.email = "Email is required.";
+  } else if (!EMAIL_REGEX.test(trimmedEmail)) {
+    nextErrors.email = "Enter a valid email address.";
+  }
+
+  if (!password) {
+    nextErrors.password = "Password is required.";
+  } else if (password.length < MIN_PASSWORD_LENGTH) {
+    nextErrors.password = `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`;
+  }
+
+  return nextErrors;
+}
+
+function LoginForm({ onSubmit }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState("");
-  const [succeeded, setSucceeded] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const errors = validate(values);
-
-  function handleChange(field) {
-    return (e) => {
-      setValues((v) => ({ ...v, [field]: e.target.value }));
-      if (formError) setFormError("");
-    };
-  }
-
-  function handleBlur(field) {
-    return () => setTouched((t) => ({ ...t, [field]: true }));
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setTouched({ email: true, password: true });
-    if (Object.keys(errors).length > 0) return;
-
-    setSubmitting(true);
+  async function handleSubmit(event) {
+    event.preventDefault();
     setFormError("");
+
+    const nextErrors = validateFields(email, password);
+    setErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      if (onSubmit) {
-        await onSubmit(values);
-      }
-      setSucceeded(true);
-      onSuccess?.();
-    } catch (err) {
-      setFormError(err?.message || "Something went wrong. Try again.");
+      await onSubmit({ email: email.trim(), password });
+    } catch (error) {
+      setFormError(error?.message || "Something went wrong. Please try again.");
     } finally {
-      setSubmitting(false);
+      setIsSubmitting(false);
     }
   }
 
   return (
-    <div className="lf-card">
-      <div className="lf-mark" aria-hidden="true" />
-      <h1 className="lf-heading">Welcome back</h1>
-      <p className="lf-subheading">Sign in to continue.</p>
+    <form className="login-form" onSubmit={handleSubmit} noValidate>
+      <h2>Log in</h2>
 
-      <form className="lf-form" onSubmit={handleSubmit} noValidate>
-        <div className="lf-field">
-          <label htmlFor="lf-email">Email</label>
-          <input
-            id="lf-email"
-            type="email"
-            autoComplete="email"
-            placeholder="you@example.com"
-            value={values.email}
-            onChange={handleChange("email")}
-            onBlur={handleBlur("email")}
-            aria-invalid={Boolean(touched.email && errors.email)}
-            aria-describedby="lf-email-error"
-          />
-          {touched.email && errors.email && (
-            <p className="lf-error" id="lf-email-error">
-              {errors.email}
-            </p>
-          )}
-        </div>
+      {formError && (
+        <p className="login-form-error" role="alert">
+          {formError}
+        </p>
+      )}
 
-        <div className="lf-field">
-          <div className="lf-label-row">
-            <label htmlFor="lf-password">Password</label>
-            <button
-              type="button"
-              className="lf-link-btn"
-              onClick={() => setShowPassword((s) => !s)}
-            >
-              {showPassword ? "Hide" : "Show"}
-            </button>
-          </div>
+      <div className="login-form-field">
+        <label htmlFor="login-email">Email</label>
+        <input
+          id="login-email"
+          name="email"
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? "login-email-error" : undefined}
+          autoComplete="email"
+        />
+        {errors.email && (
+          <span className="login-form-field-error" id="login-email-error">
+            {errors.email}
+          </span>
+        )}
+      </div>
+
+      <div className="login-form-field">
+        <label htmlFor="login-password">Password</label>
+        <div className="login-form-password-wrapper">
           <input
-            id="lf-password"
+            id="login-password"
+            name="password"
             type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            aria-invalid={Boolean(errors.password)}
+            aria-describedby={
+              errors.password ? "login-password-error" : undefined
+            }
             autoComplete="current-password"
-            placeholder="••••••••"
-            value={values.password}
-            onChange={handleChange("password")}
-            onBlur={handleBlur("password")}
-            aria-invalid={Boolean(touched.password && errors.password)}
-            aria-describedby="lf-password-error"
           />
-          {touched.password && errors.password && (
-            <p className="lf-error" id="lf-password-error">
-              {errors.password}
-            </p>
-          )}
+          <button
+            type="button"
+            className="login-form-toggle"
+            onClick={() => setShowPassword((show) => !show)}
+            aria-pressed={showPassword}
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
         </div>
-
-        {formError && (
-          <p className="lf-form-error" role="alert">
-            {formError}
-          </p>
+        {errors.password && (
+          <span className="login-form-field-error" id="login-password-error">
+            {errors.password}
+          </span>
         )}
+      </div>
 
-        {succeeded && !formError && (
-          <p className="lf-form-success" role="status">
-            Signed in.
-          </p>
-        )}
-
-        <button className="lf-submit" type="submit" disabled={submitting}>
-          {submitting ? "Signing in…" : "Sign in"}
-        </button>
-      </form>
-    </div>
+      <button
+        type="submit"
+        className="login-form-submit"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? "Logging in…" : "Log in"}
+      </button>
+    </form>
   );
 }
 
-function validate({ email, password }) {
-  const errors = {};
-  if (!email) {
-    errors.email = "Enter your email.";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errors.email = "Enter a valid email address.";
-  }
-
-  if (!password) {
-    errors.password = "Enter your password.";
-  } else if (password.length < 8) {
-    errors.password = "Password must be at least 8 characters.";
-  }
-
-  return errors;
-}
+export default LoginForm;
+export { validateFields };
