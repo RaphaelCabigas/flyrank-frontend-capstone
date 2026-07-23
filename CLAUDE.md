@@ -39,13 +39,6 @@ This project is built with React and Vite. The goal is to create a clean, mainta
 - Avoid excessive selector nesting.
 - Group related styles together.
 - Keep styles modular and component-specific.
-- Reuse the CSS custom properties already defined in `src/index.css`
-  (`--accent`, `--border`, `--text-h`, etc.) instead of defining new
-  component-scoped color or font variables. If a needed token doesn't exist,
-  add it to `src/index.css`, not to the component's own stylesheet.
-- Do not add external font or asset imports (e.g. `@import url(...)` for
-  Google Fonts) inside component stylesheets. Fonts are defined once in
-  `src/index.css`.
 
 ## Naming Conventions
 
@@ -117,8 +110,6 @@ When generating code:
 - Prefer simple and maintainable solutions.
 - Avoid unnecessary dependencies.
 - Keep generated code consistent with the current codebase.
-- Reuse existing CSS custom properties in `src/index.css` rather than
-  inventing new ones (see SCSS Conventions above).
 - When asked to build a form, write it, then write and run tests before
   considering the task done — do not stop at "it renders and looks right."
 
