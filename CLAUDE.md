@@ -8,9 +8,8 @@ This project is built with React and Vite. The goal is to create a clean, mainta
 
 - React
 - Vite
-- JavaScript (ES6+)
+- TypeScript (ES6+)
 - SCSS (Sass)
-- Vitest + React Testing Library
 - Git
 - GitHub
 
@@ -29,7 +28,7 @@ This project is built with React and Vite. The goal is to create a clean, mainta
 - Store page-level components in `src/pages`.
 - Keep images and icons in `src/assets`.
 - Place SCSS files alongside the component they style when appropriate.
-- Co-locate a `*.test.jsx` file next to each component that has form logic,
+- Co-locate a `*.test.tsx` file next to each component that has form logic,
   validation, or conditional rendering.
 
 ## SCSS Conventions
@@ -70,9 +69,9 @@ Use PascalCase.
 Examples:
 
 ```
-Header.jsx
-HeroSection.jsx
-FeatureCard.jsx
+Header.tsx
+HeroSection.tsx
+FeatureCard.tsx
 ```
 
 ### Variables and Functions

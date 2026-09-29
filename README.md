@@ -1,12 +1,10 @@
-# Flyrank Frontend Capstone By Raphael Cabigas
-
-This repository contains files for the Flyrank Frontend AI Engineering Internship from July 2026.
+# Accessible Component Fundamentals - Week 4
 
 ## Tech Stack
 
 - React
 - Vite
-- JavaScript (ES6+)
+- Typescript (ES6+)
 - SCSS (Sass)
 - Git / GitHub
 
