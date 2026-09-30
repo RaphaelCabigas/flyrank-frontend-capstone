@@ -2,72 +2,75 @@
 
 ## Project Overview
 
-This project is built with React and Vite. The goal is to create a clean, maintainable, and responsive web application while following consistent coding and styling conventions.
+This project is built with Next.js (App Router) and Tailwind CSS. The goal is to create a clean, maintainable, responsive web application that is deployed from day one: every commit lands on a live Vercel preview URL.
 
 ## Tech Stack
 
+- Next.js
 - React
-- Vite
 - JavaScript (ES6+)
-- SCSS (Sass)
-- Vitest + React Testing Library
-- Git
-- GitHub
+- Tailwind CSS
+- ESLint
+- Git / GitHub
+- Vercel
 
 ## Code Style
 
-- Use functional React components.
-- Use React Hooks instead of class components.
+- Use functional React components and Hooks only.
 - Use ES6+ syntax.
 - Keep components focused on a single responsibility.
 - Prefer reusable components over duplicated code.
 - Use descriptive variable and function names.
+- Avoid unnecessary dependencies. Ask before adding one.
+
+## Server vs. Client Components
+
+- Components are **Server Components by default**.
+- Add `'use client'` only where interactivity is required (state, effects, event handlers, browser APIs).
+- Push `'use client'` as far down the tree as possible. Extract the small interactive piece into its own client component instead of marking a whole page or layout as client.
+- Fetch data in Server Components (async components / `fetch`), not in `useEffect`, unless the data depends on client-only state.
 
 ## File Structure
 
-- Organize reusable UI inside `src/components`.
-- Store page-level components in `src/pages`.
-- Keep images and icons in `src/assets`.
-- Place SCSS files alongside the component they style when appropriate.
-- Co-locate a `*.test.jsx` file next to each component that has form logic,
-  validation, or conditional rendering.
+Use the `src/` directory with the App Router:
 
-## SCSS Conventions
+```
+src/
+├── app/                # Routes, layouts, pages (file-based routing)
+│   ├── layout.jsx      # Root layout (shared shell + navigation)
+│   ├── page.jsx        # Home
+│   ├── globals.css     # Tailwind import + design tokens (@theme)
+│   ├── health/
+│   │   └── page.jsx    # Health-check page that renders fetched data
+│   └── <route>/page.jsx
+├── components/         # Reusable UI components
+├── hooks/              # Custom React hooks (client-side)
+├── lib/                # Helpers, data-fetching utilities, constants
+└── assets/             # Images and icons (or /public for static files)
+```
 
-- Use SCSS for all styling.
-- Nest selectors only when it improves readability.
-- Avoid excessive selector nesting.
-- Group related styles together.
-- Keep styles modular and component-specific.
-- Reuse the CSS custom properties already defined in `src/index.css`
-  (`--accent`, `--border`, `--text-h`, etc.) instead of defining new
-  component-scoped color or font variables. If a needed token doesn't exist,
-  add it to `src/index.css`, not to the component's own stylesheet.
-- Do not add external font or asset imports (e.g. `@import url(...)` for
-  Google Fonts) inside component stylesheets. Fonts are defined once in
-  `src/index.css`.
+- Every screen in the project spec must exist as a routed placeholder page (`app/<route>/page.jsx`).
+- Shared chrome (header, navigation, footer) lives in the root layout, not repeated per page.
+- Use `next/link` for internal navigation, `next/image` for images.
+- Route files follow Next.js conventions (`page.jsx`, `layout.jsx`, `loading.jsx`, `error.jsx`, `not-found.jsx`).
+
+## Styling: Tailwind Only
+
+- Style exclusively with Tailwind utility classes in JSX. Do not create SCSS, `.module.css`, or per-component stylesheets.
+- The only CSS file is `src/app/globals.css`, which contains the Tailwind import and the design tokens.
+- Define design tokens once, in `globals.css`, using Tailwind's `@theme` block. Do not hardcode hex values in components.
+- **Palette: sky blue.** Use Tailwind's built-in `sky` scale as the brand palette, exposed through semantic tokens (for example `brand`, `brand-hover`, `surface`, `muted`) so components say `bg-brand` instead of `bg-sky-500`. If a needed token doesn't exist, add it to `globals.css`, not to a component.
+- Do not add external font or asset imports (`@import url(...)`, `<link>` to Google Fonts). Use `next/font` once in the root layout.
+- Extract repeated class combinations into a React component, not into `@apply` rules. Use `@apply` sparingly or not at all.
+- Mobile-first: write base styles for small screens, then layer on `sm:`, `md:`, `lg:`, `xl:` variants.
+- Every page and component must work at **375px** and **1280px** widths, with no horizontal scrolling.
+- Support dark mode only if the spec asks for it.
 
 ## Naming Conventions
 
-### CSS Classes
-
-Use kebab-case (dash-separated) for all class names.
-
-Examples:
-
-```
-head-wrapper
-head-container
-hero-section
-feature-card
-primary-button
-```
-
 ### React Components
 
-Use PascalCase.
-
-Examples:
+Use PascalCase for component files and names.
 
 ```
 Header.jsx
@@ -79,8 +82,6 @@ FeatureCard.jsx
 
 Use camelCase.
 
-Examples:
-
 ```javascript
 userData;
 handleSubmit;
@@ -88,43 +89,41 @@ fetchProducts;
 isLoading;
 ```
 
+### Routes and Folders
+
+Use kebab-case for route folder names (`app/order-history/page.jsx`).
+
+## Deployment (Vercel)
+
+- The GitHub repo is connected to Vercel. Every push builds a preview deployment.
+- Before considering a task done, `npm run build` must pass locally. The preview URL must load with no build errors.
+- Keep the health-check page (`/health`) working. It renders data fetched on the server so a deployment can be verified end to end.
+
 ## Form & Validation Rules
 
-- Always `.trim()` string input (especially email addresses) before running
-  it through a validation regex. Untrimmed input against
-  `^[^\s@]+@[^\s@]+\.[^\s@]+$`-style patterns rejects otherwise-valid values
-  that have incidental leading/trailing whitespace.
-- Validation logic must be extracted into a standalone, exported function
-  (e.g. `validateFields`), not left as a closure inside the component. This
-  is what makes it independently unit-testable.
-- Any interactive toggle button (show/hide password, expand/collapse, etc.)
-  must set `aria-pressed` reflecting its current boolean state. A toggle
-  without `aria-pressed` is a review-blocking accessibility gap, not a
-  style nitpick.
-- New form components are not complete without a co-located test file
-  covering: empty-field submission, at least one invalid-format case, the
-  success path, and the rejected/error path.
+- Always `.trim()` string input (especially email addresses) before running it through a validation regex.
+- Validation logic must be extracted into a standalone, exported function (e.g. `validateFields`) in `src/lib`, not left as a closure inside the component.
+- Every input has an associated `<label>`. Errors use `aria-invalid` and `aria-describedby`.
+- Any interactive toggle button (show/hide password, expand/collapse, etc.) must set `aria-pressed` reflecting its current boolean state.
+- Focus states must be visible (use Tailwind `focus-visible:` utilities).
 
 ## AI Assistant Guidelines
 
 When generating code:
 
 - Follow the existing project structure.
-- Use SCSS instead of plain CSS.
-- Use kebab-case for all CSS class names.
-- Do not rename existing classes unless requested.
+- Use Tailwind utility classes. Never SCSS or plain CSS files.
+- Default to Server Components. Justify every `'use client'`.
+- Reuse the design tokens in `globals.css` rather than inventing new ones.
+- Do not rename existing files, routes, or components unless requested.
 - Reuse existing components whenever possible.
 - Prefer simple and maintainable solutions.
-- Avoid unnecessary dependencies.
-- Keep generated code consistent with the current codebase.
-- Reuse existing CSS custom properties in `src/index.css` rather than
-  inventing new ones (see SCSS Conventions above).
-- When asked to build a form, write it, then write and run tests before
-  considering the task done — do not stop at "it renders and looks right."
+- Never write secrets into the repo, even as placeholders that look real.
+- Finish by running lint and build, not just by confirming that it renders.
 
 ## Git Workflow
 
-Use Conventional Commits.
+Use Conventional Commits. Commit often, since every push produces a preview deployment.
 
 Examples:
 
@@ -133,3 +132,4 @@ Examples:
 - `style: update header spacing`
 - `refactor: simplify card component`
 - `docs: update README`
+- `chore: add env var template`
